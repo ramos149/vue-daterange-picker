@@ -314,8 +314,8 @@
           this.$parent.$emit('inputChanged', this.inputValue);
 
           if ((this.checkIn.getFullYear() != newDate.getFullYear()) || (new Date().getFullYear() != newDate.getFullYear())) {
-            this.checkInText = this.checkIn.getDate() + ' ' + this.i18n["month-names"][this.checkIn.getMonth()].slice(0,3) + ' ' + this.checkIn.getFullYear();
-            this.checkOutText = newDate.getDate() + ' ' + this.i18n["month-names"][newDate.getMonth()].slice(0,3) + ' ' + newDate.getFullYear();
+            this.checkInText = this.checkIn.getDate() + ' ' + this.i18n["month-names-btn"][this.checkIn.getMonth()].slice(0,3) + ' ' + this.checkIn.getFullYear();
+            this.checkOutText = newDate.getDate() + ' ' + this.i18n["month-names-btn"][newDate.getMonth()].slice(0,3) + ' ' + newDate.getFullYear();
           }
           else {
             this.checkOutText = newDate.getDate() + ' ' + this.i18n["month-names-btn"][newDate.getMonth()];
