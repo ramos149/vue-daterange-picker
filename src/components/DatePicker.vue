@@ -1,145 +1,145 @@
 <template lang='pug'>
-  .datepicker__wrapper(v-if='show' v-on-click-outside="handleOutsideClick")
-    .datepicker__dummy-wrapper(v-if='(checkIn || checkOut)' @click='isOpen = !isOpen' :class="`${isOpen || checkIn || checkOut ? 'datepicker__dummy-wrapper--is-active' : ''}` ")
-      button.datepicker__dummy-input.datepicker__input(
-        data-qa='datepickerInput'
-        :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''} ${singleDaySelection ? 'datepicker__dummy-input--single-date' : ''}`"
-        v-text="`${checkIn ? (this.formatText=='Year') ? checkInText : formatDate(checkIn) : i18n['check-in']}`"
-        type="button"
-      )
-      button.datepicker__dummy-input.datepicker__input(
-        v-if='!singleDaySelection'
-        :class="`${isOpen && checkOut == null && checkIn !== null ? 'datepicker__dummy-input--is-active' : ''}`"
-        v-text="`${checkOut ? (this.formatText=='Year') ? checkOutText : formatDate(checkOut) : i18n['check-out']}`"
-        type="button"
-      )
-    .datepicker__dummy-wrapper(
-      v-if='(!checkIn && !checkOut)'
-      @click='isOpen = !isOpen'
-      :class="`${isOpen ? 'datepicker__dummy-wrapper--is-active' : ''}` "
-      )
-      .datepicker__choose-dates(
-        v-text="`${screenSize === 'desktop' ? i18n['choose-dates'] : i18n['dates']}`"
-      )
-    .datepicker( :class='`${ !isOpen ? "datepicker--closed" : "datepicker--open" }`')
-      .-hide-on-desktop
-        .datepicker__dummy-wrapper.datepicker__dummy-wrapper--no-border(
-          v-if='(checkIn || checkOut)'
-          @click='isOpen = !isOpen'
-          :class="`${isOpen || checkIn || checkOut ? 'datepicker__dummy-wrapper--is-active' : ''}` "
-        )
-          button.datepicker__dummy-input.datepicker__input(
-            :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''}`"
+    .datepicker__wrapper(v-if='show' v-on-click-outside="handleOutsideClick")
+        .datepicker__dummy-wrapper(v-if='(checkIn || checkOut)' @click='isOpen = !isOpen' :class="`${isOpen || checkIn || checkOut ? 'datepicker__dummy-wrapper--is-active' : ''}` ")
+            button.datepicker__dummy-input.datepicker__input(
+            data-qa='datepickerInput'
+            :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''} ${singleDaySelection ? 'datepicker__dummy-input--single-date' : ''}`"
             v-text="`${checkIn ? (this.formatText=='Year') ? checkInText : formatDate(checkIn) : i18n['check-in']}`"
             type="button"
-          )
-          button.datepicker__dummy-input.datepicker__input(
+            )
+            button.datepicker__dummy-input.datepicker__input(
+            v-if='!singleDaySelection'
             :class="`${isOpen && checkOut == null && checkIn !== null ? 'datepicker__dummy-input--is-active' : ''}`"
             v-text="`${checkOut ? (this.formatText=='Year') ? checkOutText : formatDate(checkOut) : i18n['check-out']}`"
             type="button"
-          )
-        .datepicker__dummy-wrapper-mobile(v-if='!checkIn && !checkOut' @click='isOpen = !isOpen' :class="`${isOpen ? 'datepicker__dummy-wrapper__mobile' : ''}` ")
-          .datepicker__choose-dates__mobile(
-            v-text="`${i18n['choose-dates-extended']}`"
-          )
-        .datepicker__close-button.-hide-on-desktop(v-if='isOpen' @click='hideDatepicker') ＋
-      .datepicker__inner
-        .datepicker__header.-table(v-if='screenSize === "desktop" && firstOpen && desktopHeader')
-          .datepicker__datepicker-tooltip
-            span.icon-lamp
-            span.datepicker__datepicker-tooltip__text(
-              v-text="`${i18n['datepicker-tooltip']}`"
             )
-          span.datepicker__datepicker-enter-dates-later(
-            v-text="`${i18n['enter-dates-later']}`"
-            @click='hideDatepicker'
-          )
-        .datepicker__header
-          span.datepicker__month-button.datepicker__month-button--prev.-hide-up-to-tablet(
-            @click='renderPreviousMonth'
-          )
-          span.datepicker__month-button.datepicker__month-button--next.-hide-up-to-tablet(
-            @click='renderNextMonth'
-          )
-        .datepicker__months(v-if='screenSize === "desktop"')
-          div.datepicker__month(v-for='n in [0,1]'  v-bind:key='n')
-            h1.datepicker__month-name(v-text='getMonth(months[activeMonthIndex+n].days[15].date)')
-            .datepicker__week-row.-hide-up-to-tablet
-              .datepicker__week-name(
-                v-for="(dayName, index) in i18n['day-names']"
-                v-text='dayName'
-                :class="`${(index == 5 || index == 6) ? 'weekend' : ''}`"
-                )
-            .square(
-              v-for='day in months[activeMonthIndex+n].days'
-              @mouseover='hoveringDate = day.date'
-              :class='checkToday(day.date)'
-              )
-              Day(
-                :options="$props"
-                @dayClicked='handleDayClick($event)'
-                :date='day.date'
-                :sortedDisabledDates='sortedDisabledDates'
-                :nextDisabledDate='nextDisabledDate'
-                :activeMonthIndex='activeMonthIndex'
-                :hoveringDate='hoveringDate'
-                :tooltipMessage='tooltipMessage'
-                :dayNumber='getDay(day.date)'
-                :belongsToThisMonth='day.belongsToThisMonth'
-                :checkIn='checkIn'
-                :checkOut='checkOut'
-              )
-        .datepicker__footer
-          span.datepicker__clear-button(
-            v-if='screenSize === "desktop" && checkIn != null && checkOut != null'
-            v-text="`${i18n['clear-dates']}`"
-            @click='clearSelection'
-          )
-        div(v-if='screenSize !== "desktop" && isOpen')
-          .datepicker__months#swiperWrapper
-            div.datepicker__month(
-              v-for='(a, n) in months'
-              v-bind:key='n'
+        .datepicker__dummy-wrapper(
+        v-if='(!checkIn && !checkOut)'
+        @click='isOpen = !isOpen'
+        :class="`${isOpen ? 'datepicker__dummy-wrapper--is-active' : ''}` "
+        )
+            .datepicker__choose-dates(
+            v-text="`${screenSize === 'desktop' ? i18n['choose-dates'] : i18n['dates']}`"
             )
-              h1.datepicker__month-name(
-                v-text='getMonth(months[n].days[15].date)'
-              )
-              .datepicker__week-row
-                .datepicker__week-name(
-                  v-for="(dayName, index) in i18n['day-names']"
-                  v-text='dayName'
-                  :class="`${(index == 5 || index == 6) ? 'weekend' : ''}`"
+        .datepicker( :class='`${ !isOpen ? "datepicker--closed" : "datepicker--open" }`')
+            .-hide-on-desktop
+                .datepicker__dummy-wrapper.datepicker__dummy-wrapper--no-border(
+                v-if='(checkIn || checkOut)'
+                @click='isOpen = !isOpen'
+                :class="`${isOpen || checkIn || checkOut ? 'datepicker__dummy-wrapper--is-active' : ''}` "
                 )
-              .square(v-for='(day, index) in months[n].days'
-                @mouseover='hoveringDate = day.date'
-                v-bind:key='index'
-                :class='checkToday(day.date)'
-              )
-                Day(
-                  :options="$props"
-                  @dayClicked='handleDayClick($event)'
-                  :date='day.date'
-                  :sortedDisabledDates='sortedDisabledDates'
-                  :nextDisabledDate='nextDisabledDate'
-                  :activeMonthIndex='activeMonthIndex'
-                  :hoveringDate='hoveringDate'
-                  :tooltipMessage='tooltipMessage'
-                  :dayNumber='getDay(day.date)'
-                  :belongsToThisMonth='day.belongsToThisMonth'
-                  :checkIn='checkIn'
-                  :checkOut='checkOut'
-                )
-            .footer__mobile
-              .clear-dates--mobile(
-              v-if='checkIn != null && checkOut != null'
-              v-text="`${i18n['clear-dates']}`"
-              @click='clearSelection'
-              )
-              div.next--mobile(
-                v-if='this.showMoreButton'
-                @click='renderMultipleMonth(3)' type="button"
-                v-text="`${i18n['show-more']}`"
-              )
+                    button.datepicker__dummy-input.datepicker__input(
+                    :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''}`"
+                    v-text="`${checkIn ? (this.formatText=='Year') ? checkInText : formatDate(checkIn) : i18n['check-in']}`"
+                    type="button"
+                    )
+                    button.datepicker__dummy-input.datepicker__input(
+                    :class="`${isOpen && checkOut == null && checkIn !== null ? 'datepicker__dummy-input--is-active' : ''}`"
+                    v-text="`${checkOut ? (this.formatText=='Year') ? checkOutText : formatDate(checkOut) : i18n['check-out']}`"
+                    type="button"
+                    )
+                .datepicker__dummy-wrapper-mobile(v-if='!checkIn && !checkOut' @click='isOpen = !isOpen' :class="`${isOpen ? 'datepicker__dummy-wrapper__mobile' : ''}` ")
+                    .datepicker__choose-dates__mobile(
+                    v-text="`${i18n['choose-dates-extended']}`"
+                    )
+                .datepicker__close-button.-hide-on-desktop(v-if='isOpen' @click='hideDatepicker') ＋
+            .datepicker__inner
+                .datepicker__header.-table(v-if='screenSize === "desktop" && firstOpen && desktopHeader')
+                    .datepicker__datepicker-tooltip
+                        span.icon-lamp
+                        span.datepicker__datepicker-tooltip__text(
+                        v-text="`${i18n['datepicker-tooltip']}`"
+                        )
+                    span.datepicker__datepicker-enter-dates-later(
+                    v-text="`${i18n['enter-dates-later']}`"
+                    @click='hideDatepicker'
+                    )
+                .datepicker__header
+                    span.datepicker__month-button.datepicker__month-button--prev.-hide-up-to-tablet(
+                    @click='renderPreviousMonth'
+                    )
+                    span.datepicker__month-button.datepicker__month-button--next.-hide-up-to-tablet(
+                    @click='renderNextMonth'
+                    )
+                .datepicker__months(v-if='screenSize === "desktop"')
+                    div.datepicker__month(v-for='n in [0,1]'  v-bind:key='n')
+                        h1.datepicker__month-name(v-text='getMonth(months[activeMonthIndex+n].days[15].date)')
+                        .datepicker__week-row.-hide-up-to-tablet
+                            .datepicker__week-name(
+                            v-for="(dayName, index) in i18n['day-names']"
+                            v-text='dayName'
+                            :class="`${(index == 5 || index == 6) ? 'weekend' : ''}`"
+                            )
+                        .square(
+                        v-for='day in months[activeMonthIndex+n].days'
+                        @mouseover='hoveringDate = day.date'
+                        :class='checkToday(day.date)'
+                        )
+                            Day(
+                            :options="$props"
+                            @dayClicked='handleDayClick($event)'
+                            :date='day.date'
+                            :sortedDisabledDates='sortedDisabledDates'
+                            :nextDisabledDate='nextDisabledDate'
+                            :activeMonthIndex='activeMonthIndex'
+                            :hoveringDate='hoveringDate'
+                            :tooltipMessage='tooltipMessage'
+                            :dayNumber='getDay(day.date)'
+                            :belongsToThisMonth='day.belongsToThisMonth'
+                            :checkIn='checkIn'
+                            :checkOut='checkOut'
+                            )
+                .datepicker__footer
+                    span.datepicker__clear-button(
+                    v-if='screenSize === "desktop" && checkIn != null && checkOut != null'
+                    v-text="`${i18n['clear-dates']}`"
+                    @click='clearSelection'
+                    )
+                div(v-if='screenSize !== "desktop" && isOpen')
+                    .datepicker__months#swiperWrapper
+                        div.datepicker__month(
+                        v-for='(a, n) in months'
+                        v-bind:key='n'
+                        )
+                            h1.datepicker__month-name(
+                            v-text='getMonth(months[n].days[15].date)'
+                            )
+                            .datepicker__week-row
+                                .datepicker__week-name(
+                                v-for="(dayName, index) in i18n['day-names']"
+                                v-text='dayName'
+                                :class="`${(index == 5 || index == 6) ? 'weekend' : ''}`"
+                                )
+                            .square(v-for='(day, index) in months[n].days'
+                            @mouseover='hoveringDate = day.date'
+                            v-bind:key='index'
+                            :class='checkToday(day.date)'
+                            )
+                                Day(
+                                :options="$props"
+                                @dayClicked='handleDayClick($event)'
+                                :date='day.date'
+                                :sortedDisabledDates='sortedDisabledDates'
+                                :nextDisabledDate='nextDisabledDate'
+                                :activeMonthIndex='activeMonthIndex'
+                                :hoveringDate='hoveringDate'
+                                :tooltipMessage='tooltipMessage'
+                                :dayNumber='getDay(day.date)'
+                                :belongsToThisMonth='day.belongsToThisMonth'
+                                :checkIn='checkIn'
+                                :checkOut='checkOut'
+                                )
+                        .footer__mobile
+                            .clear-dates--mobile(
+                            v-if='checkIn != null && checkOut != null'
+                            v-text="`${i18n['clear-dates']}`"
+                            @click='clearSelection'
+                            )
+                            div.next--mobile(
+                            v-if='this.showMoreButton'
+                            @click='renderMultipleMonth(3)' type="button"
+                            v-text="`${i18n['show-more']}`"
+                            )
 
 </template>
 
@@ -163,6 +163,7 @@
     'dates': 'Dates',
     'enter-dates-later': 'Enter dates later',
     'month-names': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+    'month-names-btn': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     'show-more': 'More',
   };
 
@@ -299,7 +300,7 @@
       checkIn(newDate) {
         this.$emit("checkInChanged", newDate)
         if (newDate !== null) {
-          this.checkInText = fecha.format(newDate, 'D MMMM')
+          this.checkInText = newDate.getDate() + ' ' + this.i18n["month-names-btn"][newDate.getMonth()];
         }
       },
       checkOut(newDate) {
@@ -313,11 +314,11 @@
           this.$parent.$emit('inputChanged', this.inputValue);
 
           if ((this.checkIn.getFullYear() != newDate.getFullYear()) || (new Date().getFullYear() != newDate.getFullYear())) {
-            this.checkInText = fecha.format(this.checkIn, 'D MMM YYYY')
-            this.checkOutText = fecha.format(newDate, 'D MMM YYYY')
+            this.checkInText = this.checkIn.getDate() + ' ' + this.i18n["month-names"][this.checkIn.getMonth()].slice(0,3) + ' ' + this.checkIn.getFullYear();
+            this.checkOutText = newDate.getDate() + ' ' + this.i18n["month-names"][newDate.getMonth()].slice(0,3) + ' ' + newDate.getFullYear();
           }
           else {
-            this.checkOutText = fecha.format(newDate, 'D MMMM')
+            this.checkOutText = newDate.getDate() + ' ' + this.i18n["month-names-btn"][newDate.getMonth()];
           }
         }
 
@@ -385,7 +386,7 @@
 
       clearSelection() {
         this.hoveringDate = null,
-        this.checkIn = null;
+          this.checkIn = null;
         this.checkOut = null;
         this.checkInText = null;
         this.checkOutText = null;
@@ -397,7 +398,7 @@
       },
       handleOutsideClick() {
         if (event.target.classList.contains('btn-show-datepicker')) {
-           this.isOpen = true;
+          this.isOpen = true;
         }
         else {
           if (this.isOpen) {
@@ -436,9 +437,9 @@
           this.checkIn = event.date
           this.checkOut = event.date
         } else if (this.checkIn !== null && this.checkOut == null) {
-            if(fecha.format(new Date(this.checkIn), 'YYYYMMDD') >= fecha.format(new Date(event.date), 'YYYYMMDD')){
-              this.checkIn = event.date;
-            } else this.checkOut = event.date;
+          if(fecha.format(new Date(this.checkIn), 'YYYYMMDD') >= fecha.format(new Date(event.date), 'YYYYMMDD')){
+            this.checkIn = event.date;
+          } else this.checkOut = event.date;
         } else {
           this.checkOut = null;
           this.checkIn = event.date;
@@ -465,7 +466,7 @@
         // }
 
         firstDayOfLastMonth = this.months[this.months.length - 1].days
-            .filter((day) => day.belongsToThisMonth === true);
+          .filter((day) => day.belongsToThisMonth === true);
 
         if (this.endDate !== Infinity) {
           if (fecha.format(firstDayOfLastMonth[0].date, 'YYYYMM') ==
@@ -561,6 +562,7 @@
         dayNames: this.i18n['day-names'],
         dayNamesShort: this.shortenString(this.i18n['day-names'], 3),
         monthNames: this.i18n['month-names'],
+        monthNamesBtn: this.i18n['month-names-btn'],
         monthNamesShort: this.shortenString(this.i18n['month-names'], 3),
         amPm: ['am', 'pm'],
         // D is the day of the month, function returns something like...  3rd or 11th
@@ -686,70 +688,70 @@
         z-index: 10;
 
         @include  device($desktop) {
-          top: $height-desktop;
+            top: $height-desktop;
         }
 
         @include  device($up-to-tablet) {
-          top: $height-mobile;
+            top: $height-mobile;
         }
 
         .square {
-          position: relative;
+            position: relative;
 
-          &--today{
-            z-index: 1;
-          }
+            &--today{
+                z-index: 1;
+            }
         }
 
         .footer__mobile{
-          position: fixed;
-          width: 100%;
-          min-height: 56px;
-          bottom: 0;
-          left: 0;
-          position: -webkit-sticky !important;
-          padding: 15px 10px;
-          background-color: $white;
-          border: none;
-          z-index: 9999!important;
-          text-align: left;
-          -webkit-box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.05);
-          box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.05);
-          background-color: #fff;
-          .clear-dates--mobile {
-            display: inline-block;
-            width: auto;
-            color: #2d6cb4;
-            cursor: pointer;
-            font-size: 14px;
-            line-height: 34px;
-            padding-left: 17px;
+            position: fixed;
+            width: 100%;
+            min-height: 56px;
+            bottom: 0;
+            left: 0;
+            position: -webkit-sticky !important;
+            padding: 15px 10px;
+            background-color: $white;
+            border: none;
+            z-index: 9999!important;
             text-align: left;
-          }
-          .next--mobile {
-              float: right;
-              color: #444;
-              background-color: transparent;
-              font-size: 14px;
-              line-height: 16px;
-              border-radius: 3px;
-              padding: 8px 15px;
-              font-weight: 400;
-              vertical-align: middle;
-              -ms-touch-action: manipulation;
-              touch-action: manipulation;
-              cursor: pointer;
-              background-image: none;
-              border: 1px solid #d1d1d1;
-              -webkit-user-select: none;
-              -moz-user-select: none;
-              -ms-user-select: none;
-              user-select: none;
-              text-align: center;
-              white-space: nowrap;
-              width: fit-content;
-              margin-right: 17px;
-          }
+            -webkit-box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.05);
+            box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.05);
+            background-color: #fff;
+            .clear-dates--mobile {
+                display: inline-block;
+                width: auto;
+                color: #2d6cb4;
+                cursor: pointer;
+                font-size: 14px;
+                line-height: 34px;
+                padding-left: 17px;
+                text-align: left;
+            }
+            .next--mobile {
+                float: right;
+                color: #444;
+                background-color: transparent;
+                font-size: 14px;
+                line-height: 16px;
+                border-radius: 3px;
+                padding: 8px 15px;
+                font-weight: 400;
+                vertical-align: middle;
+                -ms-touch-action: manipulation;
+                touch-action: manipulation;
+                cursor: pointer;
+                background-image: none;
+                border: 1px solid #d1d1d1;
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                text-align: center;
+                white-space: nowrap;
+                width: fit-content;
+                margin-right: 17px;
+            }
         }
         &--closed {
             box-shadow: 0 15px 30px 10px rgba($black, 0);
@@ -773,15 +775,15 @@
                 width: 100%;
                 margin-top: 0;
                 .datepicker__dummy-input:first-child{
-                  position: relative;
-                  &:after {
-                    display: block;
-                    content: "—";
-                    position: absolute;
-                    right: -5px;
-                    top: 8px;
-                    font-size: 12px;
-                  }
+                    position: relative;
+                    &:after {
+                        display: block;
+                        content: "—";
+                        position: absolute;
+                        right: -5px;
+                        top: 8px;
+                        font-size: 12px;
+                    }
                 }
             }
         }
@@ -817,13 +819,13 @@
             text-transform: lowercase;
 
             .mobile{
-              background: $white;
-              font-family: inherit;
-              font-weight: 500;
-              margin: 0;
-              line-height: 1.4;
-              font-size: 19px;
-              color: #000;
+                background: $white;
+                font-family: inherit;
+                font-weight: 500;
+                margin: 0;
+                line-height: 1.4;
+                font-size: 19px;
+                color: #000;
             }
 
             &:focus {
@@ -873,71 +875,71 @@
                     z-index: 1;
                 }
                 .datepicker__dummy-input{
-                  font-family: inherit;
-                  font-weight: 500;
-                  margin: 0;
-                  line-height: 1.4;
-                  font-size: 17px;
-                  color: #000;
+                    font-family: inherit;
+                    font-weight: 500;
+                    margin: 0;
+                    line-height: 1.4;
+                    font-size: 17px;
+                    color: #000;
                 }
             }
 
             &--is-active {
-              background: $dark-gray;
-              color: $white;
-              border: none;
-              .datepicker__dummy-input:first-child {
-                margin-left: 20px;
-                margin-right: 0px;
-                @include  device($up-to-tablet) {
-                  margin-left: 12px;
+                background: $dark-gray;
+                color: $white;
+                border: none;
+                .datepicker__dummy-input:first-child {
+                    margin-left: 20px;
+                    margin-right: 0px;
+                    @include  device($up-to-tablet) {
+                        margin-left: 12px;
+                    }
                 }
-              }
-              .datepicker__dummy-input:last-child {
-                margin-right: 20px;
-                margin-left: 0px;
-                @include  device($up-to-tablet) {
-                  margin-right: 12px;
+                .datepicker__dummy-input:last-child {
+                    margin-right: 20px;
+                    margin-left: 0px;
+                    @include  device($up-to-tablet) {
+                        margin-right: 12px;
+                    }
                 }
-              }
             }
 
             &__mobile {
-              text-align: center;
-              background-color: $white;
-              min-height: 43px;
-              font-family: PT Sans;
-              line-height: 1.4;
-              color: $black;
-              font-size: 15px;
-              padding: 10px 20px 0px 20px;
-              border-bottom: 1px solid #d1d1d1;
-              position: relative;
-              z-index: 1;
+                text-align: center;
+                background-color: $white;
+                min-height: 43px;
+                font-family: PT Sans;
+                line-height: 1.4;
+                color: $black;
+                font-size: 15px;
+                padding: 10px 20px 0px 20px;
+                border-bottom: 1px solid #d1d1d1;
+                position: relative;
+                z-index: 1;
             }
 
         }
 
         &__choose-dates {
-              font-size: 15px;
-              cursor: pointer;
-              border-radius: 3px;
-              margin-top: -1px;
-              text-align: center;
-              padding: 0 20px;
-              @include  device($up-to-tablet) {
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin-top: -1px;
+            text-align: center;
+            padding: 0 20px;
+            @include  device($up-to-tablet) {
                 font-size: 14px;
                 padding: 0 12px;
-              }
-              &__mobile {
+            }
+            &__mobile {
                 font-family: inherit;
                 font-weight: 500;
                 margin: 0;
                 line-height: 1.4;
                 font-size: 17px;
                 color: #000;
-              }
             }
+        }
 
         &__dummy-input {
             color: $white;
@@ -952,7 +954,7 @@
             height: 42px;
 
             @include  device($up-to-tablet) {
-              height: 32px;
+                height: 32px;
             }
 
             @include device($phone) {
@@ -968,11 +970,11 @@
             }
 
             &:last-child {
-              background: transparent url('mdash.svg') no-repeat left center / 9px;
-              padding-left: 4px;
-              border-top-right-radius: 3px;
-              border-bottom-right-radius: 3px;
-              text-indent: 8px;
+                background: transparent url('mdash.svg') no-repeat left center / 9px;
+                padding-left: 4px;
+                border-top-right-radius: 3px;
+                border-bottom-right-radius: 3px;
+                text-indent: 8px;
             }
 
             &--is-active {
@@ -1049,15 +1051,15 @@
                 color: $black;
 
                 &:hover {
-                  background: #6FA759;
-                  color: $white;
-                  opacity: 1;
+                    background: #6FA759;
+                    color: $white;
+                    opacity: 1;
                 }
             }
 
             &--today {
-              border: 1px double #e10600;
-              z-index: 1;
+                border: 1px double #e10600;
+                z-index: 1;
             }
 
             &--first-day-selected,
@@ -1164,10 +1166,10 @@
 
 
                 &:last-of-type {
-                  margin-bottom: 75px;
+                    margin-bottom: 75px;
                 }
                 &:last-child {
-                  margin-bottom: 75px;
+                    margin-bottom: 75px;
                 }
             }
 
@@ -1282,23 +1284,23 @@
         }
 
         &__datepicker-tooltip{
-          display: inline;
+            display: inline;
 
-          &__text{
-            color: $medium-gray;
-            vertical-align: middle!important;
-          }
+            &__text{
+                color: $medium-gray;
+                vertical-align: middle!important;
+            }
 
-          .icon-lamp{
-            width: 28px;
-            height: 28px;
-            background-repeat: no-repeat;
-            background-image: url(lamp.svg);
-            display: inline-block;
-            vertical-align: middle;
-            bottom: 0;
-            pointer-events: all;
-            margin-right: 10px;
+            .icon-lamp{
+                width: 28px;
+                height: 28px;
+                background-repeat: no-repeat;
+                background-image: url(lamp.svg);
+                display: inline-block;
+                vertical-align: middle;
+                bottom: 0;
+                pointer-events: all;
+                margin-right: 10px;
             }
         }
 
@@ -1319,11 +1321,11 @@
         }
 
         &__footer{
-          margin-top: 250px;
+            margin-top: 250px;
         }
-      }
+    }
     .weekend{
-      color: #f51449;
+        color: #f51449;
     }
 
     // Modifiers
