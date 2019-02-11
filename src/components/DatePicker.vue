@@ -30,12 +30,12 @@
         )
           button.datepicker__dummy-input.datepicker__input(
             :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''}`"
-            v-text="`${checkIn ? formatDate(checkIn) : i18n['check-in']}`"
+            v-text="`${checkIn ? (this.formatText=='Year') ? checkInText : formatDate(checkIn) : i18n['check-in']}`"
             type="button"
           )
           button.datepicker__dummy-input.datepicker__input(
             :class="`${isOpen && checkOut == null && checkIn !== null ? 'datepicker__dummy-input--is-active' : ''}`"
-            v-text="`${checkOut ? formatDate(checkOut) : i18n['check-out']}`"
+            v-text="`${checkOut ? (this.formatText=='Year') ? checkOutText : formatDate(checkOut) : i18n['check-out']}`"
             type="button"
           )
         .datepicker__dummy-wrapper-mobile(v-if='!checkIn && !checkOut' @click='isOpen = !isOpen' :class="`${isOpen ? 'datepicker__dummy-wrapper__mobile' : ''}` ")
@@ -298,7 +298,9 @@
       },
       checkIn(newDate) {
         this.$emit("checkInChanged", newDate)
-        this.checkInText = fecha.format(newDate, 'D MMMM')
+        if (newDate !== null) {
+          this.checkInText = fecha.format(newDate, 'D MMMM')
+        }
       },
       checkOut(newDate) {
         if (this.checkOut !== null && this.checkOut !== null) {
@@ -385,6 +387,8 @@
         this.hoveringDate = null,
         this.checkIn = null;
         this.checkOut = null;
+        this.checkInText = null;
+        this.checkOutText = null;
         this.nextDisabledDate = null;
         this.show = true;
         this.parseDisabledDates();
