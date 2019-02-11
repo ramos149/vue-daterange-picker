@@ -4,17 +4,17 @@
       button.datepicker__dummy-input.datepicker__input(
         data-qa='datepickerInput'
         :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''} ${singleDaySelection ? 'datepicker__dummy-input--single-date' : ''}`"
-        v-text="`${checkIn ? formatDate(checkIn) : i18n['check-in']}`"
+        v-text="`${checkIn ? (this.formatText=='Year') ? checkInText : formatDate(checkIn) : i18n['check-in']}`"
         type="button"
       )
       button.datepicker__dummy-input.datepicker__input(
         v-if='!singleDaySelection'
         :class="`${isOpen && checkOut == null && checkIn !== null ? 'datepicker__dummy-input--is-active' : ''}`"
-        v-text="`${checkOut ? formatDate(checkOut) : i18n['check-out']}`"
+        v-text="`${checkOut ? (this.formatText=='Year') ? checkOutText : formatDate(checkOut) : i18n['check-out']}`"
         type="button"
       )
     .datepicker__dummy-wrapper(
-      v-if='(!checkIn && !checkOut)' 
+      v-if='(!checkIn && !checkOut)'
       @click='isOpen = !isOpen'
       :class="`${isOpen ? 'datepicker__dummy-wrapper--is-active' : ''}` "
       )
@@ -30,12 +30,12 @@
         )
           button.datepicker__dummy-input.datepicker__input(
             :class="`${isOpen && checkIn == null ? 'datepicker__dummy-input--is-active' : ''}`"
-            v-text="`${checkIn ? formatDate(checkIn) : i18n['check-in']}`"
+            v-text="`${checkIn ? (this.formatText=='Year') ? checkInText : formatDate(checkIn) : i18n['check-in']}`"
             type="button"
           )
           button.datepicker__dummy-input.datepicker__input(
             :class="`${isOpen && checkOut == null && checkIn !== null ? 'datepicker__dummy-input--is-active' : ''}`"
-            v-text="`${checkOut ? formatDate(checkOut) : i18n['check-out']}`"
+            v-text="`${checkOut ? (this.formatText=='Year') ? checkOutText : formatDate(checkOut) : i18n['check-out']}`"
             type="button"
           )
         .datepicker__dummy-wrapper-mobile(v-if='!checkIn && !checkOut' @click='isOpen = !isOpen' :class="`${isOpen ? 'datepicker__dummy-wrapper__mobile' : ''}` ")
@@ -129,7 +129,7 @@
                   :checkIn='checkIn'
                   :checkOut='checkOut'
                 )
-            .footer__mobile    
+            .footer__mobile
               .clear-dates--mobile(
               v-if='checkIn != null && checkOut != null'
               v-text="`${i18n['clear-dates']}`"
@@ -140,7 +140,7 @@
                 @click='renderMultipleMonth(3)' type="button"
                 v-text="`${i18n['show-more']}`"
               )
-            
+
 </template>
 
 <script>
@@ -189,6 +189,10 @@
       },
       format: {
         default: 'YYYY-MM-DD',
+        type: String
+      },
+      formatText: {
+        default: '',
         type: String
       },
       startDate: {
@@ -262,6 +266,8 @@
         hoveringDate: null,
         checkIn: this.startingDateValue,
         checkOut: this.endingDateValue,
+        checkInText: this.startingDateValue,
+        checkOutText: this.endingDateValue,
         currentDate: new Date(),
         months: [],
         activeMonthIndex: 0,
@@ -292,6 +298,9 @@
       },
       checkIn(newDate) {
         this.$emit("checkInChanged", newDate)
+        if (newDate !== null) {
+          this.checkInText = fecha.format(newDate, 'D MMMM')
+        }
       },
       checkOut(newDate) {
         if (this.checkOut !== null && this.checkOut !== null) {
@@ -302,6 +311,14 @@
           this.reRender();
           this.isOpen = false;
           this.$parent.$emit('inputChanged', this.inputValue);
+
+          if ((this.checkIn.getFullYear() != newDate.getFullYear()) || (new Date().getFullYear() != newDate.getFullYear())) {
+            this.checkInText = fecha.format(this.checkIn, 'D MMM YYYY')
+            this.checkOutText = fecha.format(newDate, 'D MMM YYYY')
+          }
+          else {
+            this.checkOutText = fecha.format(newDate, 'D MMMM')
+          }
         }
 
         this.$emit("checkOutChanged", newDate);
@@ -370,6 +387,8 @@
         this.hoveringDate = null,
         this.checkIn = null;
         this.checkOut = null;
+        this.checkInText = null;
+        this.checkOutText = null;
         this.nextDisabledDate = null;
         this.show = true;
         this.parseDisabledDates();
@@ -575,7 +594,7 @@
         if(this.screenSize !== 'desktop' && this.isOpen){
           let swiperWrapper = document.getElementById("swiperWrapper");
           let startDate = document.getElementsByClassName('datepicker__month-day--last-day-selected')[0];
-          
+
           //scroll to selected dates if set
           if(this.checkOut !== null && this.checkOut !== null && !this.scrolledToSelectedDates){
             let startDate = document.querySelector('.square div .datepicker__month-day--last-day-selected');
@@ -692,7 +711,7 @@
           padding: 15px 10px;
           background-color: $white;
           border: none;
-          z-index: 9999!important; 
+          z-index: 9999!important;
           text-align: left;
           -webkit-box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.05);
           box-shadow: 0px -2px 3px 0px rgba(0, 0, 0, 0.05);
@@ -896,7 +915,7 @@
               position: relative;
               z-index: 1;
             }
-            
+
         }
 
         &__choose-dates {
@@ -1083,7 +1102,7 @@
             fill: #e4e7e7;
             stroke-width: 1;
             &--prev {
-                
+
             }
 
             &--next {
@@ -1142,7 +1161,7 @@
                 padding-bottom: 1px;
                 padding-top: 30px;
                 margin-top: 10px;
-                
+
 
                 &:last-of-type {
                   margin-bottom: 75px;
