@@ -598,11 +598,18 @@
           let startDate = document.getElementsByClassName('datepicker__month-day--last-day-selected')[0];
 
           //scroll to selected dates if set
-          if(this.checkOut !== null && this.checkOut !== null && !this.scrolledToSelectedDates){
-            let startDate = document.querySelector('.square div .datepicker__month-day--last-day-selected');
+          if(this.checkIn !== null && this.checkOut !== null && !this.scrolledToSelectedDates){
+            let startDate = document.querySelector('.square div .datepicker__month-day--first-day-selected');
+            let endDate = document.querySelector('.square div .datepicker__month-day--last-day-selected');
+
             startDate = startDate.parentElement.parentElement; //go to square div to measure offsetTop
+            endDate = endDate.parentElement.parentElement; //go to square div to measure offsetTop
+
             if(startDate){
-              swiperWrapper.scrollTop = startDate.offsetTop;
+              if(window.innerHeight < (endDate.offsetTop - startDate.offsetTop))
+                swiperWrapper.scrollTop = (endDate.offsetTop + startDate.offsetTop) / 2
+              else
+                swiperWrapper.scrollTop = startDate.offsetTop;
               this.scrolledToSelectedDates = true;
             }
           }
