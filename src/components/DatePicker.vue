@@ -304,7 +304,7 @@
         }
       },
       checkOut(newDate) {
-        if (this.checkOut !== null && this.checkOut !== null) {
+        if (this.checkOut !== null && this.checkIn !== null) {
           this.hoveringDate = null;
           this.nextDisabledDate = null;
           this.show = true;
