@@ -587,6 +587,11 @@
         }
         this.renderMultipleMonth(monthDiff+2);
         this.activeMonthIndex = monthDiff;
+
+        if (this.formatText=='Year') {
+            this.checkInText = this.startingDateValue.getDate() + ' ' + this.i18n["month-names-btn"][this.startingDateValue.getMonth()];
+            this.checkOutText = this.endingDateValue.getDate() + ' ' + this.i18n["month-names-btn"][this.endingDateValue.getMonth()];
+        }
       }
       this.parseDisabledDates();
     },
