@@ -53,6 +53,7 @@
                     span.datepicker__datepicker-enter-dates-later(
                     v-text="`${i18n['enter-dates-later']}`"
                     @click='hideDatepicker'
+                    ref="hideCal"
                     )
                 .datepicker__header
                     span.datepicker__month-button.datepicker__month-button--prev.-hide-up-to-tablet(
@@ -94,6 +95,7 @@
                     v-if='screenSize === "desktop" && checkIn != null && checkOut != null'
                     v-text="`${i18n['clear-dates']}`"
                     @click='clearSelection'
+                    ref="resetDate"
                     )
                 div(v-if='screenSize !== "desktop" && isOpen')
                     .datepicker__months#swiperWrapper
@@ -286,6 +288,7 @@
 
     watch: {
       isOpen(value) {
+        console.log(this);
         if (this.screenSize !== 'desktop') {
           const bodyClassList = document.querySelector('body').classList;
 
