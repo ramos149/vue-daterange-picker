@@ -288,7 +288,6 @@
 
     watch: {
       isOpen(value) {
-        console.log(this);
         if (this.screenSize !== 'desktop') {
           const bodyClassList = document.querySelector('body').classList;
 
